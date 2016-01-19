@@ -1,0 +1,30 @@
+{
+  "name": "slack-form",
+  "version": "1.0.0",
+  "description": "A form input element that posts to a slack channel using a webhook",
+  "authors": [
+    "Fabian Schlieper"
+  ],
+  "keywords": [
+    "slack",
+    "form"
+  ],
+  "main": "slack-form.html",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/f4bsch/slack-form.git"
+  },
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/f4bsch/slack-form",
+  "ignore": [],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0"
+  },
+  "devDependencies": {
+    "paper-styles": "polymerelements/paper-styles#^1.0.2",
+    "test-fixture": "PolymerElements/test-fixture#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  }
+}
