@@ -91,7 +91,7 @@ This code may only be used under the BSD style license found at http://polymer.g
 		},
 		
 		handleFeedbackIncData: function(e, detail) {
-			this.browserDetails = e.target.checked ? this.getInfoString() : '';
+			this.browserDetails = e.target.checked ? this.getPlatformInfoString() : '';
 		},
 		
 		handleFeedbackSend: function() {
