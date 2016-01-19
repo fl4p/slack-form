@@ -7,7 +7,8 @@
   ],
   "keywords": [
     "slack",
-    "form"
+    "form",
+    "web-components"
   ],
   "main": "slack-form.html",
   "private": false,
