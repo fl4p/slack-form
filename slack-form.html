@@ -10,138 +10,136 @@ This code may only be used under the BSD style license found at http://polymer.g
 <link rel="import" href="../iron-localstorage/iron-localstorage.html">
 
 <dom-module id="slack-form">
-  <template>
-    <style>
-	:host {
-		display: block;
-	}
-
-	:host pre {
-		overflow-x: auto;
-		overflow-y: hidden;
-		padding: 0 10px;
-		font-size: 0.8em;
-		line-height: 0.8em;
-		background: white;
-	}
-	
-	:host .browser-info-wrap {
-		visibility: hidden;
-	}
-	
-	:host[browser-info-text] .browser-info-wrap {
-		visibility: visible;
-		margin-top: 1.5em;
-	}
-    </style>
-	<iron-localstorage name="slack-form-name" value="{{feedbackName}}"></iron-localstorage>	
-		
-	<paper-input label="Name" value="{{feedbackName}}" required pattern=".{2,}" auto-validate error-message="Please fill in your name"></paper-input>
-	<paper-textarea label="Message" value="{{feedbackMsg}}" required pattern=".{6,}" auto-validate error-message="Please be more precise"></paper-textarea>
-	
-	<div class="browser-info-wrap"> 
-		<paper-checkbox id="feedbackIncData" on-change="handleFeedbackIncData">[[browserInfoText]]</paper-checkbox>  
-		<pre>{{browserDetails}}</pre>
-		<paper-button style="float:right;" on-click="handleFeedbackSend">send</paper-button>
-	</div>
-
-  </template>
-
-  <script>
-    (function() {
-      'use strict';
-      Polymer({
-        is: 'slack-form',
-        properties: {
-			currentPageTitle: String,
-			browserInfoText: String,
-			webhookUrl: String,
-			channel: String,
-			
-			
-			feedbackName: {
-				type: String,
-                value: '',
-            },
-			
-			feedbackMsg: {
-				type: String,
-                value: ''
-            },
-			
-			browserDetails: {
-				type: String,
-                value: ''
+    <template>
+        <style>
+            :host {
+                display: block;
             }
-        },
-		
-		ready: function() {
-			//this.feedbackName || (this.feedbackName='');
-		},
-		
-		getPlatformInfoString: function() {
-			var _navigator = {};
-			for (var i in navigator)  (navigator[i] === null || typeof navigator[i].length == 'undefined' ||  navigator[i].length > 0) && (_navigator[i] = navigator[i]);
 
-			delete _navigator.plugins;
-			delete _navigator.mimeTypes;
-			delete _navigator.languages;
+            :host pre {
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 0 10px;
+                font-size: 0.8em;
+                line-height: 0.8em;
+                background: white;
+            }
 
-			return JSON.stringify(_navigator, null, '  ');
-		},
-		
-		handleFeedbackIncData: function(e, detail) {
-			this.browserDetails = e.target.checked ? this.getPlatformInfoString() : '';
-		},
-		
-		handleFeedbackSend: function() {
-			var user = this.feedbackName || '', msg = this.feedbackMsg || '';	
-			if(user.length < 2 || msg.length < 3) {
-				this.fire('error', {username: user, text: msg, error: 'Not sent, check your input!'});
-				return false;
-			}
-			
-			msg = '<'+window.location.href+'|@'+(this.currentPageTitle?this.currentPageTitle:'ref')+'>: ' + msg;
-			
-			if(this.browserDetails) msg += '\nBrowser:\n' + this.browserDetails.replace(/\s+/g,' ');	
-			
-			this.sendMessage(user, msg, {
-				error: (function(err) { 
-					this.fire('error', {username: user, text: msg, error: err});
-				}).bind(this),
-				success: (function() {
-					this.fire('message-sent', {username: user, text: msg});
-					this.feedbackMsg = ' ';	
-					this.$.feedbackIncData.checked = false;
-					this.browserDetails = '';
-				}).bind(this)
-			});
-		},
-		
-		sendMessage: function(username, msg, callbacks, callbackError) {
-			var xhttp = new XMLHttpRequest();
-			
-			xhttp.open("POST", this.webhookUrl, true);
-			xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-			
-			xhttp.onreadystatechange = function () {
-				if (xhttp.readyState != 4) return;
-				if(xhttp.status == 200) {
-					callbacks && callbacks.success && callbacks.success();
-				} else {
-					callbacks && callbacks.error && callbacks.error(xhttp.response + ' ('+xhttp.status+': '+xhttp.statusText+')');
-				}
-				console.log(xhttp.response);		
-			};
-			
-			xhttp.send('payload='+encodeURIComponent(JSON.stringify({
-				channel: this.channel,
-				username: username,
-				text: msg
-			})));
-			
-		}	
-      });
-    })();
-  </script>
+            :host .browser-info-wrap {
+                visibility: hidden;
+            }
+
+            :host[browser-info-text] .browser-info-wrap {
+                visibility: visible;
+                margin-top: 1.5em;
+            }
+        </style>
+        <iron-localstorage name="slack-form-name" value="{{feedbackName}}"></iron-localstorage>
+
+        <paper-input label="Name" value="{{feedbackName}}" required pattern=".{2,}" auto-validate
+                     error-message="Please fill in your name"></paper-input>
+        <paper-textarea label="Message" value="{{feedbackMsg}}" required pattern=".{6,}" auto-validate
+                        error-message="Please be more precise"></paper-textarea>
+
+        <div class="browser-info-wrap">
+            <paper-checkbox id="feedbackIncData" on-change="handleFeedbackIncData">[[browserInfoText]]</paper-checkbox>
+            <pre>{{browserDetails}}</pre>
+            <paper-button on-click="handleFeedbackSend">Send</paper-button>
+        </div>
+
+    </template>
+
+    <script>
+        (function () {
+            'use strict';
+            Polymer({
+                is: 'slack-form',
+                properties: {
+                    currentPageTitle: String,
+                    browserInfoText: String,
+                    webhookUrl: String,
+                    channel: String,
+
+
+                    feedbackName: {
+                        type: String,
+                        value: '',
+                    },
+
+                    feedbackMsg: {
+                        type: String,
+                        value: ''
+                    },
+
+                    browserDetails: {
+                        type: String,
+                        value: ''
+                    }
+                },
+
+                getPlatformInfoString: function () {
+                    var _navigator = {};
+                    for (var i in navigator)  (navigator[i] === null || typeof navigator[i].length == 'undefined' || navigator[i].length > 0) && (_navigator[i] = navigator[i]);
+
+                    delete _navigator.plugins;
+                    delete _navigator.mimeTypes;
+                    delete _navigator.languages;
+
+                    return JSON.stringify(_navigator, null, '  ');
+                },
+
+                handleFeedbackIncData: function (e, detail) {
+                    this.browserDetails = e.target.checked ? this.getPlatformInfoString() : '';
+                },
+
+                handleFeedbackSend: function () {
+                    var user = this.feedbackName || '', msg = this.feedbackMsg || '';
+                    if (user.length < 2 || msg.length < 3) {
+                        this.fire('error', {username: user, text: msg, error: 'Not sent, check your input!'});
+                        return false;
+                    }
+
+                    msg = '<' + window.location.href + '|@' + (this.currentPageTitle ? this.currentPageTitle : 'ref') + '>: ' + msg;
+
+                    if (this.browserDetails) msg += '\nBrowser:\n' + this.browserDetails.replace(/\s+/g, ' ');
+
+                    this.sendMessage(user, msg, {
+                        error: (function (err) {
+                            this.fire('error', {username: user, text: msg, error: err});
+                        }).bind(this),
+                        success: (function () {
+                            this.fire('message-sent', {username: user, text: msg});
+                            this.feedbackMsg = ' ';
+                            this.$.feedbackIncData.checked = false;
+                            this.browserDetails = '';
+                        }).bind(this)
+                    });
+                },
+
+                sendMessage: function (username, msg, callbacks, callbackError) {
+                    var xhttp = new XMLHttpRequest();
+
+                    xhttp.open("POST", this.webhookUrl, true);
+                    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+                    xhttp.onreadystatechange = function () {
+                        if (xhttp.readyState != 4) return;
+                        if (xhttp.status == 200) {
+                            callbacks && callbacks.success && callbacks.success();
+                        } else {
+                            callbacks && callbacks.error && callbacks.error(xhttp.response + ' (' + xhttp.status + ': ' + xhttp.statusText + ')');
+                        }
+                        console.log(xhttp.response);
+                    };
+
+                    xhttp.send('payload=' + encodeURIComponent(JSON.stringify({
+                                channel: this.channel,
+                                username: username,
+                                text: msg
+                            })));
+
+                }
+            });
+        })();
+    </script>
 </dom-module>
